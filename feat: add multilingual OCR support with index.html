@@ -1,0 +1,18 @@
+<select id="ocrLanguageDropdown"></select>
+<input type="file" id="ocrFile" accept="image/*" />
+<button id="ocrProcessBtn">Extract Text</button>
+<textarea id="ocrOutput" rows="10"></textarea>
+
+<script type="module">
+  import { tesseractLanguages, initOcrLanguageDropdown } from "./js/config/ocrLanguageDropdown.js";
+  
+  const dropdown = document.getElementById("ocrLanguageDropdown");
+  Object.entries(tesseractLanguages).forEach(([code, name]) => {
+    const option = document.createElement("option");
+    option.value = code;
+    option.textContent = name;
+    dropdown.appendChild(option);
+  });
+
+  initOcrLanguageDropdown();
+</script>
