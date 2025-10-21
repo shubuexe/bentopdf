@@ -1,0 +1,58 @@
+import React, { useState } from 'react';
+import Tesseract from 'tesseract.js';
+
+export const tesseractLanguages = {
+  eng: 'English',
+  afr: 'Afrikaans',
+  amh: 'Amharic',
+  ara: 'Arabic',
+  // ... rest of your languages
+};
+
+function OCRComponent() {
+  const [selectedLanguage, setSelectedLanguage] = useState('eng');
+  const [image, setImage] = useState(null);
+  const [text, setText] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleImageUpload = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  const handleOCR = async () => {
+    if (!image) return;
+    
+    setIsProcessing(true);
+    const worker = await Tesseract.createWorker(selectedLanguage);
+    
+    const { data } = await worker.recognize(image);
+    setText(data.text);
+    
+    await worker.terminate();
+    setIsProcessing(false);
+  };
+
+  return (
+    <div>
+      <select 
+        value={selectedLanguage}
+        onChange={(e) => setSelectedLanguage(e.target.value)}
+        className="language-dropdown"
+      >
+        {Object.entries(tesseractLanguages).map(([code, name]) => (
+          <option key={code} value={code}>
+            {name}
+          </option>
+        ))}
+      </select>
+
+      <input type="file" onChange={handleImageUpload} accept="image/*" />
+      
+      <button onClick={handleOCR} disabled={!image || isProcessing}>
+        {isProcessing ? 'Processing...' : 'Extract Text'}
+      </button>
+
+      {text && <textarea value={text} readOnly rows={10} />}
+    </div>
+  );
+}
